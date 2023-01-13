@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 
 @DataJpaTest
+@Sql(scripts = "classpath:scripts/setup.sql")
 class UserRepositoryTest {
     static String TEST_USER_NAME = "테스트유저";
     static String TEST_PASSWORD = "1234";
@@ -37,5 +38,12 @@ class UserRepositoryTest {
             () -> assertThat(findUser.getUsername()).isEqualTo(user.getUsername()),
             () -> assertThat(findUser.getPassword()).isEqualTo(user.getPassword())
         );
+    }
+
+    @Test
+    void findByUsername() {
+        Optional<User> test1 = userRepository.findByUsername("test1");
+
+        assertTrue(test1.isPresent());
     }
 }
