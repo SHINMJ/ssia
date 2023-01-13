@@ -70,6 +70,10 @@ public class UserAuthority {
         return authority;
     }
 
+    public String getAuthorityName() {
+        return this.authority.getName();
+    }
+
     public boolean equalsAuthority(Authority authority) {
         return this.authority.equals(authority);
     }
@@ -100,4 +104,5 @@ public class UserAuthority {
     public int hashCode() {
         return Objects.hash(id);
     }
+
 }
