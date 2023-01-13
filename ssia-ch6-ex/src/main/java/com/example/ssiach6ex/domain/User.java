@@ -1,15 +1,18 @@
 package com.example.ssiach6ex.domain;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import org.springframework.util.StringUtils;
 
-@Entity
+@Entity(name = "user_table")
 public class User {
 
     @Id
@@ -19,20 +22,30 @@ public class User {
     private String username;
     private String password;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private List<Authority> authorities;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<UserAuthority> authorities = new ArrayList<>();
 
     protected User(){}
 
-    private User(String username, String password, List<Authority> authorities) {
-        validate(username, password, authorities);
+    private User(String username, String password) {
+        validate(username, password);
         this.username = username;
         this.password = password;
-        this.authorities = authorities;
     }
 
-    public static User of(String username, String password, List<Authority> authorities){
-        return new User(username, password, authorities);
+    private void validate(String username, String password){
+        if (!StringUtils.hasLength(username)){
+            throw new IllegalArgumentException("이름은 필수 입니다.");
+        }
+
+        if (!StringUtils.hasLength(password)) {
+            throw new IllegalArgumentException("비밀번호는 필수 입니다.");
+        }
+
+    }
+
+    public static User of(String username, String password){
+        return new User(username, password);
     }
 
     public Long getId() {
@@ -47,21 +60,43 @@ public class User {
         return password;
     }
 
-    public List<Authority> getAuthorities() {
+    public List<UserAuthority> getAuthorities() {
         return authorities;
     }
 
-    private void validate(String username, String password, List<Authority> authorities){
-        if (!StringUtils.hasLength(username)){
-            throw new IllegalArgumentException("이름은 필수 입니다.");
+    public void addAuthority(UserAuthority authority) {
+        this.authorities.add(authority);
+        if (!authority.equalsUser(this)){
+            authority.setUser(this);
         }
+    }
 
-        if (!StringUtils.hasLength(password)) {
-            throw new IllegalArgumentException("비밀번호는 필수 입니다.");
+    public void removeAuthority(UserAuthority authority) {
+        this.authorities.remove(authority);
+        if (authority.equalsUser(this)){
+            authority.removeUser();
         }
+    }
 
-        if (authorities.size() <= 0){
-            throw new IllegalArgumentException("하나 이상의 권한을 가져야 합니다.");
+    public boolean containAuthority(UserAuthority authority){
+        return this.authorities.contains(authority);
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        User user = (User) o;
+        return id.equals(user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
