@@ -14,13 +14,13 @@ import org.springframework.test.context.jdbc.Sql;
 @Sql(scripts = "classpath:scripts/setup.sql")
 class UserAuthorityRepositoryTest {
 
-    @Autowired()
+    @Autowired
     private UserAuthorityRepository repository;
 
-    @Autowired()
+    @Autowired
     private UserRepository userRepository;
 
-    @Autowired()
+    @Autowired
     private AuthorityRepository authorityRepository;
 
     User testUser1;
